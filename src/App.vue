@@ -1,28 +1,41 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <router-view></router-view>
+    <FooterNav v-show="$route.meta.requiresAuth" />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import FooterNav from './components/FooterNav/FooterNav'
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    FooterNav
   }
 }
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+body {
+  font-size: 16px;
+  --themeColor: #02a774;
+}
+a {
+  text-decoration: none;
+  color: #333;
+}
+div,
+span,
+header,
+button {
+  box-sizing: border-box;
+}
+input,
+button {
+  outline: none;
+  border: none;
+}
+button {
+  background: none;
 }
 </style>
