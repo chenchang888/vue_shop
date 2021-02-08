@@ -48,8 +48,7 @@ export default {
     this.$store.dispatch('getBusinessList')
   },
   methods: {
-    handleShop(e) {
-      console.log(e);
+    handleShop() {
       this.$router.push('/shop')
     }
   },

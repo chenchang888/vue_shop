@@ -16,6 +16,8 @@ export default {
 </script>
 
 <style>
+/* Unable to preventDefault inside passive event listener due to target being treated as passive */
+* { touch-action: pan-y; }
 body {
   font-size: 16px;
   --themeColor: #02a774;

@@ -24,14 +24,17 @@ const requestBusinessList = (latitude, longitude) => $http('/shops', {
     }
 })
 // 获取商家信息
-const requestGetShopInfo = () => $http('/info')
+const requestShopData = () => $http('/shopData')
 // 获取商家信息
-const requestGetShopNav = () => $http('/goods')
+// const requestGetShopInfo = () => $http('/info')
+// 获取商家信息
+// const requestGetShopNav = () => $http('/goods')
 export {
     requestLogin,
     requestAddress,
     requestSwiperShops,
     requestBusinessList,
-    requestGetShopInfo,
-    requestGetShopNav
+    requestShopData,
+    // requestGetShopInfo,
+    // requestGetShopNav
 }

@@ -1,5 +1,5 @@
-import { requestLogin, requestAddress, requestSwiperShops, requestBusinessList, requestGetShopInfo, requestGetShopNav } from '../api/index'
-import { GET_ADDRESS, GET_SWIPERSHOPS, GET_BUSINESSLIST, GET_SHOPIFO, GET_SHOPNAV } from './mutations_types'
+import { requestLogin, requestAddress, requestSwiperShops, requestBusinessList } from '../api/index'
+import { GET_ADDRESS, GET_SWIPERSHOPS, GET_BUSINESSLIST } from './mutations_types'
 export default {
     // 账号密码登录
     async accountLogin({ state }) {
@@ -20,20 +20,5 @@ export default {
     async getBusinessList({ commit, state }) {
         const res = await requestBusinessList(state.latitude, state.longitude)
         res.data.code === 0 && commit(GET_BUSINESSLIST, res.data.data)
-    },
-    // 商家信息
-    async getShopInfo({ commit }) {
-        const res = await requestGetShopInfo()
-        console.log(res);
-        res.data.code === 0 && commit(GET_SHOPIFO, res.data.data)
-    },
-    // 商家商品
-    async getShopNav({ commit }, scrollCallback) {
-        const res = await requestGetShopNav()
-        console.log(res);
-        if (res.data.code === 0) {
-            commit(GET_SHOPNAV, res.data.data)
-            scrollCallback && scrollCallback()
-        }
     }
 }

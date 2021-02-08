@@ -8,7 +8,7 @@ import store from './store'
 import Header from './components/Header/Header.vue'
 
 Vue.config.productionTip = false,
-  Vue.component('Header', Header)
+Vue.component('Header', Header)
 new Vue({
   render: h => h(App),
   router,

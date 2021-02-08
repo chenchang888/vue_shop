@@ -3,9 +3,15 @@
     <ShopHeader />
     <div class="content_container">
       <div class="nav_wrap">
-        <router-link class="item_nav" :class="$route.path==='/shop/goods'?'current':''" to="/shop/goods">点餐</router-link>
-        <router-link class="item_nav" :class="$route.path==='/shop/evaluate'?'current':''" to="/shop/evaluate">评价</router-link>
-        <router-link class="item_nav" :class="$route.path==='/shop/business'?'current':''" to="/shop/business">商家</router-link>
+        <keep-alive>
+          <router-link class="item_nav" :class="$route.path==='/shop/goods'?'current':''" to="/shop/goods" replace>点餐</router-link>
+        </keep-alive>
+        <keep-alive>
+          <router-link class="item_nav" :class="$route.path==='/shop/evaluate'?'current':''" to="/shop/evaluate" replace>评价</router-link>
+        </keep-alive>
+        <keep-alive>
+          <router-link class="item_nav" :class="$route.path==='/shop/business'?'current':''" to="/shop/business" replace>商家</router-link>
+        </keep-alive>
       </div>
       <div class="content_main">
         <router-view></router-view>
@@ -16,12 +22,38 @@
 
 <script>
 import ShopHeader from '../../components/ShopHeader/ShopHeader'
+import { mapState } from 'vuex'
+import { GET_SHOPDATA, SAVE_CARTSHOP } from '../../store/mutations_types'
 export default {
+  data() {
+    return {
+
+    }
+  },
   components: {
     ShopHeader
   },
   mounted() {
-    this.$store.dispatch('getShopInfo')
+    this.$store.dispatch('getShopData')
+    if (sessionStorage.getItem('shopData')) {
+      let shopData = JSON.parse(sessionStorage.getItem('shopData'))
+      this.$store.commit(GET_SHOPDATA, shopData)
+
+      const cartShop = shopData.goods.reduce((accumulator, currentValue) => {
+        accumulator.push(...currentValue.foods.filter(food => food.count))
+        return accumulator
+      },[])
+      console.log(cartShop);
+      this.$store.commit(SAVE_CARTSHOP, cartShop)
+    }
+    window.addEventListener('unload', () => {
+      sessionStorage.setItem('shopData', JSON.stringify(this.shopData))
+    })
+  },
+  computed: {
+    ...mapState({
+      shopData: state => state.shopModules.shopData
+    })
   }
 }
 </script>

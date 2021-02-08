@@ -1,72 +1,111 @@
 <template>
   <div class="goods_wrap">
-    <div ref="left" class="left">
-      <ul class="item_nav">
+    <div class="left">
+      <ul ref='leftLi' class="item_nav">
         <li v-for="(itemNav,index) in shopNav" :key="index" :class="index===current?'active':''" @click="handleShopNav(index)">{{itemNav.name}}</li>
       </ul>
     </div>
-    <div ref="right" class="right">
-      <ul class="foods_wrap">
+    <div class="right">
+      <ul ref='rightLi' class="foods_wrap">
         <li class="food_list" v-for="(itemNav,index) in shopNav" :key="index">
           <div class="nav_name">{{itemNav.name}}</div>
-          <div class="foods_message" v-for="(itemShop,i) in itemNav.foods" :key="i">
+          <!-- 商品信息 -->
+          <div class="foods_message" v-for="(foodShop,index) in itemNav.foods" :key="index">
             <div class="foods_img">
-              <img :src="itemShop.image" alt="">
+              <img :src="foodShop.image" alt="">
             </div>
             <div class="food_mes_right">
-              <div class="food_mes_name">{{itemShop.name}}</div>
-              <div class="food_mes_description">{{itemShop.description}}</div>
+              <div class="food_mes_name">{{foodShop.name}}</div>
+              <div class="food_mes_description">{{foodShop.description}}</div>
               <div class="food_praise">
-                <span class="food_sellCount">月售{{itemShop.sellCount}}</span>
-                <span class="food_rating">好评率{{itemShop.rating}}%</span>
+                <span class="food_sellCount">月售{{foodShop.sellCount}}</span>
+                <span class="food_rating">好评率{{foodShop.rating}}%</span>
               </div>
-              <div class="food_price">¥{{itemShop.price}}</div>
+              <div class="food_price">¥{{foodShop.price}}</div>
             </div>
+            <CartContorl :foodShop='foodShop' />
           </div>
         </li>
       </ul>
     </div>
+    <ShopCart/>
   </div>
 </template>
 
 <script>
 import BScroll from '@better-scroll/core'
 import { mapState } from 'vuex'
+import ShopCart from '../../components/ShopCart/ShopCart'
+import CartContorl from '../../components/CartContorl/CartContorl'
 
 export default {
   data() {
     return {
-      current: 0
+      current: 0,
+      rightTop: [0],//右侧每个li需要滑动的高度集,
+      scrollY: '',//右侧滚动的高度
     }
   },
+  components: {
+    CartContorl,
+    ShopCart
+  },
   mounted() {
-    this.$store.dispatch('getShopNav', () => {
+    this.$store.dispatch('getShopData', () => {
       this.$nextTick(() => {
         this._loadLeftScroll();
         this._loadRightScroll();
+        this.getRightTop()
       })
     })
   },
   methods: {
     _loadLeftScroll() {
-      new BScroll(this.$refs.left, {
+      new BScroll('.left', {
         scrollY: true,
         click: true
       })
     },
     _loadRightScroll() {
-      new BScroll(this.$refs.right, {
+      this.rightScroll = new BScroll('.right', {
         scrollY: true,
-        click: true
+        click: true,
+        probeType: 3
+      })
+      // 滑动
+      this.rightScroll.on('scroll', ({ x, y }) => {
+        this.scrollY = y
+        this.scrollX = x
+      })
+      // 滑动结束
+      this.rightScroll.on('scrollEnd', () => {
+        const index = this.rightTop.findIndex((item, index) => {
+          return Math.abs(this.scrollY) <= item - 100 && Math.abs(this.scrollY) >= this.rightTop[index - 1] - 100
+        })
+        this.current = index - 1
       })
     },
+    // 左侧商品选项
     handleShopNav(index) {
       this.current = index
-    }
+      // 更新scrollY
+      this.scrollY = this.rightTop[index]
+      this.rightScroll.scrollTo(0, -this.rightTop[index], 1000)
+    },
+    // 获取右侧滚动点的高度
+    getRightTop() {
+      Array.from(this.$refs.rightLi.children).reduce((oldValue, liItem) => {
+        oldValue += liItem.clientHeight
+        this.rightTop.push(oldValue)
+        return oldValue
+      }, 0)
+    },
   },
   computed: {
     ...mapState({
-      shopNav: state => state.shopNav
+      shopNav: state => {
+        return state.shopModules.shopData.goods
+      }
     })
   }
 }
@@ -78,6 +117,7 @@ export default {
   height: calc(100vh - 397px);
   overflow: hidden;
   .left {
+    margin-bottom: 105px;
     box-sizing: border-box;
     background-color: #f3f5f7;
     .item_nav {
@@ -95,6 +135,7 @@ export default {
   }
   .right {
     width: 580px;
+    margin-bottom: 105px;
     .foods_wrap {
       .food_list {
         .nav_name {
@@ -104,12 +145,13 @@ export default {
           color: #666;
         }
         .foods_message {
+          position: relative;
           display: flex;
           padding: 30px;
           border-bottom: 0.5px solid #999;
           background-color: #fff;
-          &:after{
-            content: '';
+          &:after {
+            content: "";
           }
           .foods_img {
             margin-right: 20px;
@@ -120,8 +162,6 @@ export default {
           }
           .food_mes_right {
             line-height: 42px;
-            .food_mes_name {
-            }
             .food_mes_description {
               color: #999;
             }

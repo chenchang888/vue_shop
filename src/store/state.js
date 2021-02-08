@@ -17,5 +17,7 @@ export default {
     // 商家列表
     businessList: [],
     // 商家详情
-    shopInfo: {}
+    shopInfo: {},
+    // 
+    shopNav:[],
 }
